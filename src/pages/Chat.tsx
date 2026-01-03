@@ -35,9 +35,10 @@ export default function Chat() {
     setMessage('');
   };
 
+  // Admin sees all other users, non-admins only see vishwa (admin)
   const chatPartners = isAdmin 
     ? profiles.filter(p => p.user_id !== user?.id)
-    : profiles.filter(p => p.username === 'vishwa');
+    : adminProfile ? [adminProfile] : [];
 
   const selectedProfile = profiles.find(p => p.user_id === selectedUserId);
 

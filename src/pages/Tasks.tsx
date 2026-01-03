@@ -1,37 +1,66 @@
 import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { useTasks } from '@/hooks/useTasks';
+import { useTasks, Task } from '@/hooks/useTasks';
+import { useProfiles } from '@/hooks/useProfiles';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Trash2, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Plus, LayoutGrid, List } from 'lucide-react';
+import { TaskCard } from '@/components/tasks/TaskCard';
+import { TaskFormDialog } from '@/components/tasks/TaskFormDialog';
+import { EisenhowerMatrix } from '@/components/tasks/EisenhowerMatrix';
 
 export default function Tasks() {
-  const { tasks, isLoading, addTask, toggleTask, deleteTask } = useTasks();
-  const [newTitle, setNewTitle] = useState('');
-  const [newDate, setNewDate] = useState('');
+  const { user, isAdmin } = useAuth();
+  const { tasks, isLoading, addTask, updateTask, toggleTask, deleteTask } = useTasks();
+  const { allProfiles } = useProfiles();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'matrix'>('list');
 
-  const handleAdd = () => {
-    if (!newTitle.trim()) return;
-    addTask.mutate({
-      title: newTitle,
-      description: null,
-      is_completed: false,
-      priority: 'medium',
-      due_date: newDate || null,
-      due_time: null,
-      is_temp_task: false,
-      deadline_at: null,
-      task_type: 'daily',
-      week_number: null,
-      month_number: null,
-      year: null,
-      visible_to: ['admin'],
-    });
-    setNewTitle('');
-    setNewDate('');
+  // Create a map of user_id to display_name
+  const creatorNames: Record<string, string> = {};
+  allProfiles.forEach(p => {
+    creatorNames[p.user_id] = p.display_name;
+  });
+
+  const handleSave = (data: Partial<Task>) => {
+    if (data.id) {
+      updateTask.mutate(data as Task);
+    } else {
+      addTask.mutate({
+        title: data.title!,
+        description: data.description || null,
+        is_completed: false,
+        priority: 'medium',
+        due_date: data.due_date || null,
+        due_time: null,
+        is_temp_task: false,
+        deadline_at: null,
+        task_type: 'daily',
+        week_number: null,
+        month_number: null,
+        year: null,
+        visible_to: data.visible_to || ['admin'],
+        signal_priority: data.signal_priority || 'green',
+        quadrant: data.quadrant || 'q4',
+      });
+    }
+    setEditingTask(null);
+  };
+
+  const handleEdit = (task: Task) => {
+    setEditingTask(task);
+    setDialogOpen(true);
+  };
+
+  const handleToggle = (id: string, completed: boolean) => {
+    toggleTask.mutate({ id, is_completed: completed });
+  };
+
+  const handleDelete = (id: string) => {
+    deleteTask.mutate(id);
   };
 
   const pendingTasks = tasks.filter(t => !t.is_completed);
@@ -40,89 +69,107 @@ export default function Tasks() {
   return (
     <AppLayout>
       <div className="space-y-6 animate-fade-in">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Tasks</h1>
-          <p className="text-muted-foreground">Manage your daily tasks</p>
-        </div>
-
-        {/* Add Task */}
-        <Card className="glass">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Input
-                placeholder="Add a new task..."
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-                className="flex-1"
-              />
-              <Input
-                type="date"
-                value={newDate}
-                onChange={(e) => setNewDate(e.target.value)}
-                className="w-full sm:w-40"
-              />
-              <Button onClick={handleAdd} className="gradient-primary" disabled={addTask.isPending}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold">Tasks</h1>
+            <p className="text-muted-foreground">Manage your daily tasks</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex rounded-lg border overflow-hidden">
+              <Button 
+                variant={viewMode === 'list' ? 'secondary' : 'ghost'} 
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="rounded-none"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+              <Button 
+                variant={viewMode === 'matrix' ? 'secondary' : 'ghost'} 
+                size="sm"
+                onClick={() => setViewMode('matrix')}
+                className="rounded-none"
+              >
+                <LayoutGrid className="h-4 w-4" />
               </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Pending Tasks */}
-        <div className="space-y-3">
-          <h2 className="font-semibold text-lg">Pending ({pendingTasks.length})</h2>
-          {pendingTasks.map(task => (
-            <Card key={task.id} className="glass animate-slide-up">
-              <CardContent className="p-4 flex items-center gap-4">
-                <Checkbox
-                  checked={task.is_completed}
-                  onCheckedChange={(checked) => toggleTask.mutate({ id: task.id, is_completed: !!checked })}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{task.title}</p>
-                  {task.due_date && (
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {format(new Date(task.due_date), 'MMM d, yyyy')}
-                    </p>
-                  )}
-                </div>
-                <Button variant="ghost" size="icon" onClick={() => deleteTask.mutate(task.id)}>
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
+            <Button 
+              onClick={() => {
+                setEditingTask(null);
+                setDialogOpen(true);
+              }} 
+              className="gradient-primary"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Task
+            </Button>
+          </div>
         </div>
 
-        {/* Completed Tasks */}
-        {completedTasks.length > 0 && (
-          <div className="space-y-3">
-            <h2 className="font-semibold text-lg text-muted-foreground">Completed ({completedTasks.length})</h2>
-            {completedTasks.map(task => (
-              <Card key={task.id} className="glass opacity-60">
-                <CardContent className="p-4 flex items-center gap-4">
-                  <Checkbox
-                    checked={task.is_completed}
-                    onCheckedChange={(checked) => toggleTask.mutate({ id: task.id, is_completed: !!checked })}
-                  />
-                  <p className="flex-1 line-through text-muted-foreground">{task.title}</p>
-                  <Button variant="ghost" size="icon" onClick={() => deleteTask.mutate(task.id)}>
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        {viewMode === 'matrix' ? (
+          <EisenhowerMatrix
+            tasks={tasks}
+            creatorNames={creatorNames}
+            onToggle={handleToggle}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+          />
+        ) : (
+          <Tabs defaultValue="pending" className="space-y-4">
+            <TabsList>
+              <TabsTrigger value="pending">Pending ({pendingTasks.length})</TabsTrigger>
+              <TabsTrigger value="completed">Completed ({completedTasks.length})</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="pending" className="space-y-3">
+              {pendingTasks.map(task => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  creatorName={creatorNames[task.user_id]}
+                  onToggle={handleToggle}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                />
+              ))}
+              {pendingTasks.length === 0 && !isLoading && (
+                <Card className="glass">
+                  <CardContent className="p-8 text-center text-muted-foreground">
+                    No pending tasks. Add one to get started!
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="completed" className="space-y-3">
+              {completedTasks.map(task => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  creatorName={creatorNames[task.user_id]}
+                  onToggle={handleToggle}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                />
+              ))}
+              {completedTasks.length === 0 && (
+                <Card className="glass">
+                  <CardContent className="p-8 text-center text-muted-foreground">
+                    No completed tasks yet.
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          </Tabs>
         )}
 
-        {tasks.length === 0 && !isLoading && (
-          <div className="text-center py-12 text-muted-foreground">
-            <p>No tasks yet. Add one above!</p>
-          </div>
-        )}
+        <TaskFormDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          task={editingTask}
+          onSave={handleSave}
+          isLoading={addTask.isPending || updateTask.isPending}
+        />
       </div>
     </AppLayout>
   );

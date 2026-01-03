@@ -1,16 +1,20 @@
+import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useSharedImages } from '@/hooks/useSharedImages';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Trash2, Upload, Image as ImageIcon } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { Trash2, Upload, Image as ImageIcon, ZoomIn } from 'lucide-react';
+import { useRef } from 'react';
+import { ImageLightbox } from '@/components/shared/ImageLightbox';
 
 export default function Timetables() {
   const { images, isLoading, uploadImage, deleteImage, isAdmin } = useSharedImages();
   const [title, setTitle] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -24,6 +28,21 @@ export default function Timetables() {
     setTitle('');
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
+
+  const openLightbox = (index: number) => {
+    setSelectedImageIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const goToPrevious = () => {
+    setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : prev));
+  };
+
+  const goToNext = () => {
+    setSelectedImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : prev));
+  };
+
+  const selectedImage = images[selectedImageIndex];
 
   return (
     <AppLayout>
@@ -65,20 +84,34 @@ export default function Timetables() {
         )}
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {images.map(image => (
-            <Card key={image.id} className="glass overflow-hidden animate-scale-in">
+          {images.map((image, index) => (
+            <Card 
+              key={image.id} 
+              className="glass overflow-hidden animate-scale-in group cursor-pointer"
+              onClick={() => openLightbox(index)}
+            >
               <div className="aspect-video bg-muted relative">
                 <img
                   src={image.image_url}
                   alt={image.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
                 />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                  <ZoomIn className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
               </div>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium truncate">{image.title}</h3>
                   {isAdmin && (
-                    <Button variant="ghost" size="icon" onClick={() => deleteImage.mutate(image.id)}>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteImage.mutate(image.id);
+                      }}
+                    >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   )}
@@ -93,6 +126,19 @@ export default function Timetables() {
             <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p>No images uploaded yet</p>
           </div>
+        )}
+
+        {selectedImage && (
+          <ImageLightbox
+            open={lightboxOpen}
+            onOpenChange={setLightboxOpen}
+            imageUrl={selectedImage.image_url}
+            title={selectedImage.title}
+            onPrevious={goToPrevious}
+            onNext={goToNext}
+            hasPrevious={selectedImageIndex > 0}
+            hasNext={selectedImageIndex < images.length - 1}
+          />
         )}
       </div>
     </AppLayout>

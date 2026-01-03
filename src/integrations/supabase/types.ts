@@ -155,6 +155,8 @@ export type Database = {
           is_temp_task: boolean
           month_number: number | null
           priority: string | null
+          quadrant: string | null
+          signal_priority: string | null
           task_type: string | null
           title: string
           updated_at: string
@@ -174,6 +176,8 @@ export type Database = {
           is_temp_task?: boolean
           month_number?: number | null
           priority?: string | null
+          quadrant?: string | null
+          signal_priority?: string | null
           task_type?: string | null
           title: string
           updated_at?: string
@@ -193,6 +197,8 @@ export type Database = {
           is_temp_task?: boolean
           month_number?: number | null
           priority?: string | null
+          quadrant?: string | null
+          signal_priority?: string | null
           task_type?: string | null
           title?: string
           updated_at?: string

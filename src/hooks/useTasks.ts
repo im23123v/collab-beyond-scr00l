@@ -19,6 +19,8 @@ export interface Task {
   month_number: number | null;
   year: number | null;
   visible_to: string[];
+  signal_priority: string;
+  quadrant: string;
   created_at: string;
   updated_at: string;
 }
