@@ -12,6 +12,7 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
+  ListChecks,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -19,6 +20,7 @@ import { useState } from 'react';
 const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/tasks', icon: CheckSquare, label: 'Tasks' },
+  { path: '/21-tasks', icon: ListChecks, label: '21 Tasks' },
   { path: '/goals', icon: Target, label: 'Goals' },
   { path: '/calendar', icon: Calendar, label: 'Calendar' },
   { path: '/chat', icon: MessageCircle, label: 'Chat' },

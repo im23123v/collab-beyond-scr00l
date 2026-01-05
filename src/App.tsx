@@ -12,6 +12,7 @@ import CalendarPage from "./pages/CalendarPage";
 import Chat from "./pages/Chat";
 import Timetables from "./pages/Timetables";
 import Team from "./pages/Team";
+import TwentyOneTasks from "./pages/TwentyOneTasks";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/chat" element={<Chat />} />
             <Route path="/timetables" element={<Timetables />} />
             <Route path="/team" element={<Team />} />
+            <Route path="/21-tasks" element={<TwentyOneTasks />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

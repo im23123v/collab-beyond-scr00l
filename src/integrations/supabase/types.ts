@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_heat: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          intensity: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          intensity?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          intensity?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       goals: {
         Row: {
           completed_count: number
@@ -271,6 +295,68 @@ export type Database = {
           visible_to?: string[] | null
           week_number?: number | null
           year?: number | null
+        }
+        Relationships: []
+      }
+      twenty_one_task_completions: {
+        Row: {
+          completed_at: string
+          id: string
+          month_number: number
+          task_id: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          completed_at?: string
+          id?: string
+          month_number: number
+          task_id: string
+          user_id: string
+          year?: number
+        }
+        Update: {
+          completed_at?: string
+          id?: string
+          month_number?: number
+          task_id?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "twenty_one_task_completions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "twenty_one_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      twenty_one_tasks: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

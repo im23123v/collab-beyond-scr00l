@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { TasksChart } from '@/components/dashboard/TasksChart';
 import { HabitHeatmap } from '@/components/dashboard/HabitHeatmap';
+import { OverallHeatmap } from '@/components/dashboard/OverallHeatmap';
 import { ProfileSwitcher } from '@/components/dashboard/ProfileSwitcher';
 import { CheckCircle2, Circle, Target, TrendingUp, Clock, Users, Zap, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
@@ -199,6 +200,12 @@ export default function Dashboard() {
 
         {/* Habit Heatmap */}
         <HabitHeatmap 
+          userId={targetUserId} 
+          isAdmin={isAdmin && (selectedProfile === 'mine' || selectedProfile === 'overall')} 
+        />
+
+        {/* Overall Daily Heat */}
+        <OverallHeatmap 
           userId={targetUserId} 
           isAdmin={isAdmin && (selectedProfile === 'mine' || selectedProfile === 'overall')} 
         />
