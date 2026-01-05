@@ -7,16 +7,16 @@ import {
   Target,
   Calendar,
   MessageCircle,
-  Image,
+  ListChecks,
   Users,
 } from 'lucide-react';
 
 const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Home' },
   { path: '/tasks', icon: CheckSquare, label: 'Tasks' },
+  { path: '/21-tasks', icon: ListChecks, label: '21 Tasks' },
   { path: '/goals', icon: Target, label: 'Goals' },
   { path: '/calendar', icon: Calendar, label: 'Calendar' },
-  { path: '/chat', icon: MessageCircle, label: 'Chat' },
 ];
 
 export function MobileNav() {
