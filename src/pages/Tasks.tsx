@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { useTasks, Task } from '@/hooks/useTasks';
 import { useProfiles } from '@/hooks/useProfiles';
@@ -6,10 +6,26 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, LayoutGrid, List } from 'lucide-react';
+import { Plus, LayoutGrid, List, Filter } from 'lucide-react';
 import { TaskCard } from '@/components/tasks/TaskCard';
 import { TaskFormDialog } from '@/components/tasks/TaskFormDialog';
 import { EisenhowerMatrix } from '@/components/tasks/EisenhowerMatrix';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+// User filter mapping
+const USER_FILTERS = [
+  { value: 'all', label: 'All' },
+  { value: 'mine', label: 'Mine' },
+  { value: '1a42f133-7129-41dc-ae20-f50bb4696923', label: 'Vishwa' },
+  { value: 'a697e29e-825c-4c43-b57a-fbbf63780d5e', label: 'Sindh' },
+  { value: '08369e71-ad89-478e-85b5-86be96661f0d', label: 'Amru' },
+];
 
 export default function Tasks() {
   const { user, isAdmin } = useAuth();
@@ -18,12 +34,20 @@ export default function Tasks() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'matrix'>('list');
+  const [userFilter, setUserFilter] = useState<string>('all');
 
   // Create a map of user_id to display_name
   const creatorNames: Record<string, string> = {};
   allProfiles.forEach(p => {
     creatorNames[p.user_id] = p.display_name;
   });
+
+  // Filter tasks based on selected user
+  const filteredTasks = useMemo(() => {
+    if (userFilter === 'all') return tasks;
+    if (userFilter === 'mine') return tasks.filter(t => t.user_id === user?.id);
+    return tasks.filter(t => t.user_id === userFilter);
+  }, [tasks, userFilter, user?.id]);
 
   const handleSave = (data: Partial<Task>) => {
     if (data.id) {
@@ -63,8 +87,8 @@ export default function Tasks() {
     deleteTask.mutate(id);
   };
 
-  const pendingTasks = tasks.filter(t => !t.is_completed);
-  const completedTasks = tasks.filter(t => t.is_completed);
+  const pendingTasks = filteredTasks.filter(t => !t.is_completed);
+  const completedTasks = filteredTasks.filter(t => t.is_completed);
 
   return (
     <AppLayout>
@@ -74,7 +98,20 @@ export default function Tasks() {
             <h1 className="text-2xl md:text-3xl font-bold">Tasks</h1>
             <p className="text-muted-foreground">Manage your daily tasks</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {isAdmin && (
+              <Select value={userFilter} onValueChange={setUserFilter}>
+                <SelectTrigger className="w-32">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {USER_FILTERS.map(f => (
+                    <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             <div className="flex rounded-lg border overflow-hidden">
               <Button 
                 variant={viewMode === 'list' ? 'secondary' : 'ghost'} 
@@ -108,7 +145,7 @@ export default function Tasks() {
 
         {viewMode === 'matrix' ? (
           <EisenhowerMatrix
-            tasks={tasks}
+            tasks={filteredTasks}
             creatorNames={creatorNames}
             onToggle={handleToggle}
             onDelete={handleDelete}
