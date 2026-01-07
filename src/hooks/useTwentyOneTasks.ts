@@ -17,6 +17,7 @@ export interface TaskCompletion {
   task_id: string;
   user_id: string;
   month_number: number;
+  day_number: number;
   year: number;
   completed_at: string;
 }
@@ -91,9 +92,9 @@ export function useTwentyOneTasks(userId?: string) {
   });
 
   const toggleCompletion = useMutation({
-    mutationFn: async ({ taskId, monthNumber }: { taskId: string; monthNumber: number }) => {
+    mutationFn: async ({ taskId, monthNumber, dayNumber }: { taskId: string; monthNumber: number; dayNumber: number }) => {
       const existing = completions.find(
-        c => c.task_id === taskId && c.month_number === monthNumber && c.year === 2026
+        c => c.task_id === taskId && c.month_number === monthNumber && c.day_number === dayNumber && c.year === 2026
       );
 
       if (existing) {
@@ -106,7 +107,13 @@ export function useTwentyOneTasks(userId?: string) {
       } else {
         const { data, error } = await supabase
           .from('twenty_one_task_completions')
-          .insert([{ task_id: taskId, user_id: targetUserId, month_number: monthNumber, year: 2026 }])
+          .insert([{ 
+            task_id: taskId, 
+            user_id: targetUserId, 
+            month_number: monthNumber, 
+            day_number: dayNumber,
+            year: 2026 
+          }])
           .select()
           .single();
         if (error) throw error;
