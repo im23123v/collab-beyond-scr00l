@@ -301,6 +301,7 @@ export type Database = {
       twenty_one_task_completions: {
         Row: {
           completed_at: string
+          day_number: number
           id: string
           month_number: number
           task_id: string
@@ -309,6 +310,7 @@ export type Database = {
         }
         Insert: {
           completed_at?: string
+          day_number: number
           id?: string
           month_number: number
           task_id: string
@@ -317,6 +319,7 @@ export type Database = {
         }
         Update: {
           completed_at?: string
+          day_number?: number
           id?: string
           month_number?: number
           task_id?: string
