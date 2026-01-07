@@ -93,15 +93,24 @@ export function useTwentyOneTasks(userId?: string) {
 
   const toggleCompletion = useMutation({
     mutationFn: async ({ taskId, monthNumber, dayNumber }: { taskId: string; monthNumber: number; dayNumber: number }) => {
-      const existing = completions.find(
-        c => c.task_id === taskId && c.month_number === monthNumber && c.day_number === dayNumber && c.year === 2026
-      );
+      // First check if completion exists
+      const { data: existingData, error: fetchError } = await supabase
+        .from('twenty_one_task_completions')
+        .select('id')
+        .eq('task_id', taskId)
+        .eq('user_id', targetUserId)
+        .eq('month_number', monthNumber)
+        .eq('day_number', dayNumber)
+        .eq('year', 2026)
+        .maybeSingle();
 
-      if (existing) {
+      if (fetchError) throw fetchError;
+
+      if (existingData) {
         const { error } = await supabase
           .from('twenty_one_task_completions')
           .delete()
-          .eq('id', existing.id);
+          .eq('id', existingData.id);
         if (error) throw error;
         return null;
       } else {
