@@ -2,46 +2,96 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Play, Pause, RotateCcw, Timer, Coffee, Flame } from 'lucide-react';
+import { Play, Pause, RotateCcw, Timer, Coffee, Flame, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PomodoroTimerProps {
   className?: string;
 }
 
-type TimerMode = 'work' | 'shortBreak' | 'longBreak';
+type TimerMode = 'work' | 'shortBreak' | 'longBreak' | 'custom';
 
 const TIMER_SETTINGS = {
   work: { duration: 25 * 60, label: 'Focus Time', color: 'from-red-500 to-orange-500' },
   shortBreak: { duration: 5 * 60, label: 'Short Break', color: 'from-green-500 to-emerald-500' },
   longBreak: { duration: 15 * 60, label: 'Long Break', color: 'from-blue-500 to-cyan-500' },
+  custom: { duration: 0, label: 'Custom', color: 'from-purple-500 to-pink-500' },
+};
+
+// Parse time input like "2h", "30m", "1h30m", "90m"
+const parseTimeInput = (input: string): number => {
+  const trimmed = input.trim().toLowerCase();
+  let totalSeconds = 0;
+  
+  // Match hours (e.g., "2h")
+  const hoursMatch = trimmed.match(/(\d+)\s*h/);
+  if (hoursMatch) {
+    totalSeconds += parseInt(hoursMatch[1]) * 60 * 60;
+  }
+  
+  // Match minutes (e.g., "30m")
+  const minutesMatch = trimmed.match(/(\d+)\s*m/);
+  if (minutesMatch) {
+    totalSeconds += parseInt(minutesMatch[1]) * 60;
+  }
+  
+  // If just a number, treat as minutes
+  if (!hoursMatch && !minutesMatch && /^\d+$/.test(trimmed)) {
+    totalSeconds = parseInt(trimmed) * 60;
+  }
+  
+  return totalSeconds;
 };
 
 export function PomodoroTimer({ className }: PomodoroTimerProps) {
   const [taskTitle, setTaskTitle] = useState('');
   const [mode, setMode] = useState<TimerMode>('work');
   const [timeLeft, setTimeLeft] = useState(TIMER_SETTINGS.work.duration);
+  const [baseDuration, setBaseDuration] = useState(TIMER_SETTINGS.work.duration);
   const [isRunning, setIsRunning] = useState(false);
   const [completedPomodoros, setCompletedPomodoros] = useState(0);
+  const [customTimeInput, setCustomTimeInput] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
+    if (hrs > 0) {
+      return `${hrs}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const progress = ((TIMER_SETTINGS[mode].duration - timeLeft) / TIMER_SETTINGS[mode].duration) * 100;
+  const progress = baseDuration > 0 ? ((baseDuration - timeLeft) / baseDuration) * 100 : 0;
 
   const handleModeChange = useCallback((newMode: TimerMode) => {
-    setMode(newMode);
-    setTimeLeft(TIMER_SETTINGS[newMode].duration);
-    setIsRunning(false);
+    if (newMode === 'custom') {
+      setShowCustomInput(true);
+      setMode('custom');
+    } else {
+      setMode(newMode);
+      setTimeLeft(TIMER_SETTINGS[newMode].duration);
+      setBaseDuration(TIMER_SETTINGS[newMode].duration);
+      setIsRunning(false);
+      setShowCustomInput(false);
+    }
   }, []);
 
+  const handleCustomTimeSet = () => {
+    const seconds = parseTimeInput(customTimeInput);
+    if (seconds > 0) {
+      setTimeLeft(seconds);
+      setBaseDuration(seconds);
+      setShowCustomInput(false);
+      setIsRunning(false);
+    }
+  };
+
   const handleReset = useCallback(() => {
-    setTimeLeft(TIMER_SETTINGS[mode].duration);
+    setTimeLeft(baseDuration);
     setIsRunning(false);
-  }, [mode]);
+  }, [baseDuration]);
 
   const handleComplete = useCallback(() => {
     if (mode === 'work') {
@@ -117,7 +167,32 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
             <Coffee className="h-3 w-3 mr-1" />
             Long
           </Button>
+          <Button
+            variant={mode === 'custom' ? 'default' : 'ghost'}
+            size="sm"
+            className="flex-1 text-xs"
+            onClick={() => handleModeChange('custom')}
+          >
+            <Clock className="h-3 w-3 mr-1" />
+            Custom
+          </Button>
         </div>
+
+        {/* Custom Time Input */}
+        {showCustomInput && (
+          <div className="flex gap-2">
+            <Input
+              placeholder="e.g. 2h, 30m, 1h30m"
+              value={customTimeInput}
+              onChange={(e) => setCustomTimeInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCustomTimeSet()}
+              className="text-center"
+            />
+            <Button onClick={handleCustomTimeSet} size="sm">
+              Set
+            </Button>
+          </div>
+        )}
 
         {/* Timer Display */}
         <div className="relative flex items-center justify-center">
