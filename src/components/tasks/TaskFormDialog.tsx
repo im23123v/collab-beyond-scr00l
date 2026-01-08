@@ -147,11 +147,9 @@ export function TaskFormDialog({ open, onOpenChange, task, onSave, isLoading }: 
             <div className="space-y-2">
               <Label>Visible To</Label>
               <Select 
-                value={visibleTo.includes('all') ? 'all' : visibleTo.includes('sindh') && visibleTo.includes('amru') ? 'both' : visibleTo[0]} 
+                value={visibleTo.includes('all') ? 'all' : visibleTo.includes('amru') ? 'amru' : visibleTo[0]} 
                 onValueChange={(v) => {
                   if (v === 'all') setVisibleTo(['all']);
-                  else if (v === 'both') setVisibleTo(['sindh', 'amru', 'admin']);
-                  else if (v === 'sindh') setVisibleTo(['sindh', 'admin']);
                   else if (v === 'amru') setVisibleTo(['amru', 'admin']);
                   else setVisibleTo(['admin']);
                 }}
@@ -161,9 +159,7 @@ export function TaskFormDialog({ open, onOpenChange, task, onSave, isLoading }: 
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">Only Me</SelectItem>
-                  <SelectItem value="sindh">Sindh</SelectItem>
                   <SelectItem value="amru">Amru</SelectItem>
-                  <SelectItem value="both">Sindh & Amru</SelectItem>
                   <SelectItem value="all">Everyone</SelectItem>
                 </SelectContent>
               </Select>
