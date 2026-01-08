@@ -106,13 +106,14 @@ export function useTwentyOneTasks(userId?: string) {
 
       if (fetchError) throw fetchError;
 
+      let result;
       if (existingData) {
         const { error } = await supabase
           .from('twenty_one_task_completions')
           .delete()
           .eq('id', existingData.id);
         if (error) throw error;
-        return null;
+        result = null;
       } else {
         const { data, error } = await supabase
           .from('twenty_one_task_completions')
@@ -126,8 +127,60 @@ export function useTwentyOneTasks(userId?: string) {
           .select()
           .single();
         if (error) throw error;
-        return data;
+        result = data;
       }
+
+      // Auto-update daily heat based on completions for that day
+      const dateStr = `2026-${String(monthNumber).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+      
+      // Count total completions for this day across all tasks
+      const { data: dayCompletions, error: countError } = await supabase
+        .from('twenty_one_task_completions')
+        .select('id')
+        .eq('user_id', targetUserId)
+        .eq('month_number', monthNumber)
+        .eq('day_number', dayNumber)
+        .eq('year', 2026);
+
+      if (countError) throw countError;
+
+      // Get total tasks count
+      const { data: totalTasks, error: tasksError } = await supabase
+        .from('twenty_one_tasks')
+        .select('id')
+        .eq('user_id', targetUserId);
+
+      if (tasksError) throw tasksError;
+
+      const completionCount = dayCompletions?.length || 0;
+      const totalTaskCount = totalTasks?.length || 1;
+      
+      // Calculate intensity (1-10) based on completion percentage
+      const completionPercent = (completionCount / totalTaskCount) * 100;
+      let intensity = 0;
+      if (completionCount > 0) {
+        intensity = Math.min(10, Math.max(1, Math.ceil(completionPercent / 10)));
+      }
+
+      // Update daily_heat
+      const { data: existingHeat } = await supabase
+        .from('daily_heat')
+        .select('id')
+        .eq('user_id', targetUserId)
+        .eq('date', dateStr)
+        .maybeSingle();
+
+      if (existingHeat) {
+        if (intensity === 0) {
+          await supabase.from('daily_heat').delete().eq('id', existingHeat.id);
+        } else {
+          await supabase.from('daily_heat').update({ intensity }).eq('id', existingHeat.id);
+        }
+      } else if (intensity > 0) {
+        await supabase.from('daily_heat').insert([{ user_id: targetUserId, date: dateStr, intensity }]);
+      }
+
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['twenty_one_task_completions'] });
