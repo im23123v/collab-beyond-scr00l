@@ -14,6 +14,9 @@ import Chat from "./pages/Chat";
 import Timetables from "./pages/Timetables";
 import Team from "./pages/Team";
 import TwentyOneTasks from "./pages/TwentyOneTasks";
+import Notes from "./pages/Notes";
+import Projects from "./pages/Projects";
+import WeeklyTasks from "./pages/WeeklyTasks";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,6 +39,9 @@ const App = () => (
               <Route path="/timetables" element={<Timetables />} />
               <Route path="/team" element={<Team />} />
               <Route path="/21-tasks" element={<TwentyOneTasks />} />
+              <Route path="/notes" element={<Notes />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/weekly-tasks" element={<WeeklyTasks />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

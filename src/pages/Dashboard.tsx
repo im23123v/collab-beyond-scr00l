@@ -10,6 +10,7 @@ import { TasksChart } from '@/components/dashboard/TasksChart';
 import { HabitHeatmap } from '@/components/dashboard/HabitHeatmap';
 import { OverallHeatmap } from '@/components/dashboard/OverallHeatmap';
 import { ProfileSwitcher } from '@/components/dashboard/ProfileSwitcher';
+import { DayScoring } from '@/components/dashboard/DayScoring';
 import { CheckCircle2, Circle, Target, TrendingUp, Clock, Users, Zap, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -209,6 +210,9 @@ export default function Dashboard() {
           userId={targetUserId} 
           isAdmin={isAdmin && (selectedProfile === 'mine' || selectedProfile === 'overall')} 
         />
+
+        {/* Day Scoring */}
+        <DayScoring />
 
         {/* Today's Tasks */}
         <Card className="glass">
