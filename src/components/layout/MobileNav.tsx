@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   CheckSquare,
   Target,
-  Calendar,
   ListChecks,
   Users,
   Sun,
@@ -15,6 +14,8 @@ import {
   Monitor,
   Leaf,
   Sunset,
+  StickyNote,
+  MoreHorizontal,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -28,7 +29,7 @@ const navItems = [
   { path: '/tasks', icon: CheckSquare, label: 'Tasks' },
   { path: '/21-tasks', icon: ListChecks, label: '21' },
   { path: '/goals', icon: Target, label: 'Goals' },
-  { path: '/calendar', icon: Calendar, label: 'Cal' },
+  { path: '/notes', icon: StickyNote, label: 'Notes' },
 ];
 
 const themeIcons: Record<Theme, React.ElementType> = {

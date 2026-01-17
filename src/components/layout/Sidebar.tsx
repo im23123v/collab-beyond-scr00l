@@ -13,6 +13,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ListChecks,
+  StickyNote,
+  FolderKanban,
+  ListTodo,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -22,7 +25,10 @@ const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { path: '/tasks', icon: CheckSquare, label: 'Tasks' },
   { path: '/21-tasks', icon: ListChecks, label: '21 Tasks' },
+  { path: '/weekly-tasks', icon: ListTodo, label: 'Weekly Tasks' },
   { path: '/goals', icon: Target, label: 'Goals' },
+  { path: '/notes', icon: StickyNote, label: 'Notes' },
+  { path: '/projects', icon: FolderKanban, label: 'Projects' },
   { path: '/calendar', icon: Calendar, label: 'Calendar' },
   { path: '/chat', icon: MessageCircle, label: 'Chat' },
   { path: '/timetables', icon: Image, label: 'Timetables' },
