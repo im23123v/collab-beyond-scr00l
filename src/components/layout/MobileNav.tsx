@@ -14,8 +14,7 @@ import {
   Monitor,
   Leaf,
   Sunset,
-  StickyNote,
-  MoreHorizontal,
+  Repeat,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -28,8 +27,8 @@ const navItems = [
   { path: '/', icon: LayoutDashboard, label: 'Home' },
   { path: '/tasks', icon: CheckSquare, label: 'Tasks' },
   { path: '/21-tasks', icon: ListChecks, label: '21' },
+  { path: '/repeat', icon: Repeat, label: 'RepEat' },
   { path: '/goals', icon: Target, label: 'Goals' },
-  { path: '/notes', icon: StickyNote, label: 'Notes' },
 ];
 
 const themeIcons: Record<Theme, React.ElementType> = {

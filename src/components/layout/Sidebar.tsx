@@ -16,6 +16,7 @@ import {
   StickyNote,
   FolderKanban,
   ListTodo,
+  Repeat,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -26,6 +27,7 @@ const navItems = [
   { path: '/tasks', icon: CheckSquare, label: 'Tasks' },
   { path: '/21-tasks', icon: ListChecks, label: '21 Tasks' },
   { path: '/weekly-tasks', icon: ListTodo, label: 'Weekly Tasks' },
+  { path: '/repeat', icon: Repeat, label: 'RepEat' },
   { path: '/goals', icon: Target, label: 'Goals' },
   { path: '/notes', icon: StickyNote, label: 'Notes' },
   { path: '/projects', icon: FolderKanban, label: 'Projects' },
