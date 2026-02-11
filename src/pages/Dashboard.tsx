@@ -11,7 +11,7 @@ import { HabitHeatmap } from '@/components/dashboard/HabitHeatmap';
 import { OverallHeatmap } from '@/components/dashboard/OverallHeatmap';
 import { ProfileSwitcher } from '@/components/dashboard/ProfileSwitcher';
 import { DayScoring } from '@/components/dashboard/DayScoring';
-import { CheckCircle2, Circle, Target, TrendingUp, Clock, Users, Zap, Calendar } from 'lucide-react';
+import { CheckCircle2, Circle, Target, TrendingUp, Clock, Users, Sparkles, Calendar, Heart } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function Dashboard() {
@@ -19,7 +19,6 @@ export default function Dashboard() {
   const { allProfiles } = useProfiles();
   const [selectedProfile, setSelectedProfile] = useState<string>('mine');
 
-  // Determine which user's data to show
   const targetUserId = selectedProfile === 'mine' 
     ? user?.id 
     : selectedProfile === 'overall' 
@@ -41,7 +40,6 @@ export default function Dashboard() {
   const activeGoals = goals.filter(g => g.completed_count < g.target_count);
   const urgentTasks = tasks.filter(t => t.quadrant === 'q1' && !t.is_completed);
 
-  // Get display name for selected profile
   const getProfileName = () => {
     if (selectedProfile === 'mine') return profile?.display_name || 'User';
     if (selectedProfile === 'overall') return 'Everyone';
@@ -49,107 +47,121 @@ export default function Dashboard() {
     return found?.display_name || 'User';
   };
 
+  const greeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6 animate-fade-in">
-        {/* Header with Profile Switcher */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              {selectedProfile === 'mine' ? `Welcome back, ${profile?.display_name || 'User'}!` : `${getProfileName()}'s Dashboard`} 👋
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              {format(new Date(), 'EEEE, MMMM d, yyyy')}
-            </p>
+        {/* Beautiful Hero Header */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/15 via-accent/10 to-primary/5 p-6 md:p-8 border border-primary/10">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+          
+          <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span className="text-sm font-medium text-primary">
+                  {format(new Date(), 'EEEE, MMMM d')}
+                </span>
+              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+                {selectedProfile === 'mine' 
+                  ? `${greeting()}, ${profile?.display_name || 'there'}` 
+                  : `${getProfileName()}'s Dashboard`
+                } ✨
+              </h1>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {todayTasks.length > 0 
+                  ? `You have ${todayTasks.length} tasks today — ${todayCompleted} done!`
+                  : "No tasks scheduled today. Enjoy your day!"
+                }
+              </p>
+            </div>
+            {isAdmin && (
+              <ProfileSwitcher
+                selectedProfile={selectedProfile}
+                onProfileChange={setSelectedProfile}
+              />
+            )}
           </div>
-          {isAdmin && (
-            <ProfileSwitcher
-              selectedProfile={selectedProfile}
-              onProfileChange={setSelectedProfile}
-            />
-          )}
         </div>
 
-        {/* Hero Stats Grid */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card className="glass overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent" />
-            <CardContent className="p-4 relative">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-primary/20">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
+          {[
+            {
+              icon: CheckCircle2,
+              value: completedTasks,
+              label: 'Completed',
+              gradient: 'from-primary/15 to-primary/5',
+              iconColor: 'text-primary',
+              iconBg: 'bg-primary/15',
+            },
+            {
+              icon: Circle,
+              value: pendingTasks.length,
+              label: 'Pending',
+              gradient: 'from-accent/15 to-accent/5',
+              iconColor: 'text-accent',
+              iconBg: 'bg-accent/15',
+            },
+            {
+              icon: Target,
+              value: activeGoals.length,
+              label: 'Active Goals',
+              gradient: 'from-success/15 to-success/5',
+              iconColor: 'text-success',
+              iconBg: 'bg-success/15',
+            },
+            {
+              icon: TrendingUp,
+              value: `${Math.round(progressPercent)}%`,
+              label: 'Progress',
+              gradient: 'from-warning/15 to-warning/5',
+              iconColor: 'text-warning',
+              iconBg: 'bg-warning/15',
+            },
+          ].map((stat, i) => (
+            <Card key={i} className="group relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-md">
+              <div className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-60`} />
+              <CardContent className="p-4 relative">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2.5 rounded-xl ${stat.iconBg} transition-transform group-hover:scale-110 duration-300`}>
+                    <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
+                  </div>
+                  <div>
+                    <p className="text-2xl md:text-3xl font-bold">{stat.value}</p>
+                    <p className="text-xs text-muted-foreground font-medium">{stat.label}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-3xl font-bold">{completedTasks}</p>
-                  <p className="text-xs text-muted-foreground">Tasks Done</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-transparent" />
-            <CardContent className="p-4 relative">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-orange-500/20">
-                  <Circle className="h-5 w-5 text-orange-500" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">{pendingTasks.length}</p>
-                  <p className="text-xs text-muted-foreground">Pending</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent" />
-            <CardContent className="p-4 relative">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-blue-500/20">
-                  <Target className="h-5 w-5 text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">{activeGoals.length}</p>
-                  <p className="text-xs text-muted-foreground">Active Goals</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass overflow-hidden relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent" />
-            <CardContent className="p-4 relative">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-green-500/20">
-                  <TrendingUp className="h-5 w-5 text-green-500" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">{Math.round(progressPercent)}%</p>
-                  <p className="text-xs text-muted-foreground">Progress</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Main Progress Card */}
+        {/* Today's Progress + Urgent */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Card className="glass lg:col-span-2">
-            <CardHeader className="pb-2">
+          <Card className="lg:col-span-2 border-border/50 overflow-hidden">
+            <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
-                <Zap className="h-5 w-5 text-primary" />
+                <Heart className="h-5 w-5 text-primary" />
                 Today's Progress
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm text-muted-foreground">
-                      {todayCompleted} of {todayTasks.length} tasks completed today
+                      {todayCompleted} of {todayTasks.length} tasks today
                     </span>
-                    <span className="text-sm font-medium">
+                    <span className="text-sm font-semibold text-primary">
                       {todayTasks.length > 0 ? Math.round((todayCompleted / todayTasks.length) * 100) : 0}%
                     </span>
                   </div>
@@ -161,9 +173,9 @@ export default function Dashboard() {
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm text-muted-foreground">
-                      Overall: {completedTasks} of {totalTasks} tasks
+                      Overall: {completedTasks} of {totalTasks}
                     </span>
-                    <span className="text-sm font-medium">{Math.round(progressPercent)}%</span>
+                    <span className="text-sm font-semibold text-primary">{Math.round(progressPercent)}%</span>
                   </div>
                   <Progress value={progressPercent} className="h-3" />
                 </div>
@@ -171,22 +183,24 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Urgent Tasks */}
-          <Card className="glass">
-            <CardHeader className="pb-2">
+          <Card className="border-border/50 overflow-hidden">
+            <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
-                <Clock className="h-5 w-5 text-red-500" />
-                Urgent & Important
+                <Clock className="h-5 w-5 text-destructive" />
+                Urgent Tasks
               </CardTitle>
             </CardHeader>
             <CardContent>
               {urgentTasks.length === 0 ? (
-                <p className="text-muted-foreground text-sm">All caught up! 🎉</p>
+                <div className="text-center py-4">
+                  <p className="text-2xl mb-1">🎉</p>
+                  <p className="text-muted-foreground text-sm">All caught up!</p>
+                </div>
               ) : (
-                <ul className="space-y-2 max-h-[120px] overflow-y-auto">
+                <ul className="space-y-2 max-h-[130px] overflow-y-auto scrollbar-thin">
                   {urgentTasks.slice(0, 5).map(task => (
-                    <li key={task.id} className="flex items-center gap-2 p-2 rounded-lg bg-red-500/10">
-                      <div className="w-2 h-2 rounded-full bg-red-500" />
+                    <li key={task.id} className="flex items-center gap-2 p-2 rounded-lg bg-destructive/8 border border-destructive/15">
+                      <div className="w-2 h-2 rounded-full bg-destructive flex-shrink-0" />
                       <span className="text-sm truncate">{task.title}</span>
                     </li>
                   ))}
@@ -196,16 +210,14 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        {/* Charts Section */}
+        {/* Charts */}
         <TasksChart tasks={tasks} goals={goals} />
 
-        {/* Habit Heatmap */}
+        {/* Heatmaps */}
         <HabitHeatmap 
           userId={targetUserId} 
           isAdmin={isAdmin && (selectedProfile === 'mine' || selectedProfile === 'overall')} 
         />
-
-        {/* Overall Daily Heat */}
         <OverallHeatmap 
           userId={targetUserId} 
           isAdmin={isAdmin && (selectedProfile === 'mine' || selectedProfile === 'overall')} 
@@ -215,27 +227,30 @@ export default function Dashboard() {
         <DayScoring />
 
         {/* Today's Tasks */}
-        <Card className="glass">
-          <CardHeader className="pb-2">
+        <Card className="border-border/50">
+          <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
+              <Calendar className="h-5 w-5 text-primary" />
               Today's Tasks
             </CardTitle>
           </CardHeader>
           <CardContent>
             {todayTasks.length === 0 ? (
-              <p className="text-muted-foreground text-sm">No tasks scheduled for today</p>
+              <div className="text-center py-6">
+                <p className="text-2xl mb-1">☀️</p>
+                <p className="text-muted-foreground text-sm">No tasks scheduled for today</p>
+              </div>
             ) : (
-              <ul className="space-y-2 max-h-[200px] overflow-y-auto">
+              <ul className="space-y-2 max-h-[250px] overflow-y-auto scrollbar-thin">
                 {todayTasks.map(task => (
-                  <li key={task.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                  <li key={task.id} className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 border border-border/50 hover:bg-muted/60 transition-colors">
                     {task.is_completed ? (
-                      <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
+                      <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0" />
                     ) : (
                       <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <span className={`block truncate ${task.is_completed ? 'line-through text-muted-foreground' : ''}`}>
+                      <span className={`block truncate font-medium ${task.is_completed ? 'line-through text-muted-foreground' : ''}`}>
                         {task.title}
                       </span>
                       {task.due_time && (
@@ -243,14 +258,14 @@ export default function Dashboard() {
                       )}
                     </div>
                     <div
-                      className="w-3 h-3 rounded-full flex-shrink-0"
+                      className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-background"
                       style={{
                         backgroundColor:
                           task.signal_priority === 'red'
-                            ? '#ef4444'
+                            ? 'hsl(350 65% 55%)'
                             : task.signal_priority === 'orange'
-                            ? '#f59e0b'
-                            : '#22c55e',
+                            ? 'hsl(38 85% 52%)'
+                            : 'hsl(160 55% 42%)',
                       }}
                     />
                   </li>
@@ -261,12 +276,12 @@ export default function Dashboard() {
         </Card>
 
         {isAdmin && selectedProfile === 'mine' && (
-          <Card className="glass border-primary/20">
+          <Card className="border-primary/20 bg-primary/5">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <Users className="h-5 w-5 text-primary" />
                 <span className="text-sm text-muted-foreground">
-                  You're logged in as admin. Use the profile switcher above to view other users' dashboards.
+                  You're logged in as admin. Use the profile switcher to view other dashboards.
                 </span>
               </div>
             </CardContent>
