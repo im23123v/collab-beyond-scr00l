@@ -15,6 +15,7 @@ import {
   Leaf,
   Sunset,
   Repeat,
+  Heart,
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -38,6 +39,7 @@ const themeIcons: Record<Theme, React.ElementType> = {
   dim: Monitor,
   forest: Leaf,
   sunset: Sunset,
+  ammu: Heart,
 };
 
 export function MobileNav() {
@@ -46,7 +48,7 @@ export function MobileNav() {
   const ThemeIcon = themeIcons[theme];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border z-50 md:hidden safe-area-inset-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 bg-card/90 backdrop-blur-xl border-t border-border/50 z-50 md:hidden safe-area-inset-bottom">
       <div className="flex items-center justify-around py-2">
         {navItems.map((item) => (
           <NavLink
@@ -54,9 +56,9 @@ export function MobileNav() {
             to={item.path}
             className={({ isActive }) =>
               cn(
-                'flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors',
+                'flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-all duration-200',
                 isActive
-                  ? 'text-primary'
+                  ? 'text-primary scale-105'
                   : 'text-muted-foreground'
               )
             }
@@ -70,9 +72,9 @@ export function MobileNav() {
             to="/team"
             className={({ isActive }) =>
               cn(
-                'flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-colors',
+                'flex flex-col items-center gap-1 px-2 py-2 rounded-lg transition-all duration-200',
                 isActive
-                  ? 'text-primary'
+                  ? 'text-primary scale-105'
                   : 'text-muted-foreground'
               )
             }

@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Sun, Moon, Monitor, Leaf, Sunset, Sparkles } from 'lucide-react';
+import { Sun, Moon, Monitor, Leaf, Sunset, Sparkles, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const themeIcons: Record<Theme, React.ElementType> = {
@@ -16,6 +16,7 @@ const themeIcons: Record<Theme, React.ElementType> = {
   dim: Monitor,
   forest: Leaf,
   sunset: Sunset,
+  ammu: Heart,
 };
 
 interface ThemeToggleProps {

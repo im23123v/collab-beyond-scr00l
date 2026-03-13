@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-export type Theme = 'light' | 'dark' | 'midnight' | 'dim' | 'forest' | 'sunset';
+export type Theme = 'light' | 'dark' | 'midnight' | 'dim' | 'forest' | 'sunset' | 'ammu';
 
 interface ThemeContextType {
   theme: Theme;
@@ -9,6 +9,7 @@ interface ThemeContextType {
 }
 
 const themes: { value: Theme; label: string; description: string }[] = [
+  { value: 'ammu', label: '🌸 Ammu', description: 'Dreamy rose & cream' },
   { value: 'light', label: 'Light', description: 'Clean and bright' },
   { value: 'dark', label: 'Dark', description: 'Easy on the eyes' },
   { value: 'midnight', label: 'Midnight', description: 'Deep black AMOLED' },
@@ -22,14 +23,12 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
     const stored = localStorage.getItem('app-theme') as Theme;
-    return stored || 'dark';
+    return stored || 'ammu';
   });
 
   useEffect(() => {
     const root = document.documentElement;
-    // Remove all theme classes
-    root.classList.remove('light', 'dark', 'midnight', 'dim', 'forest', 'sunset');
-    // Add current theme class
+    root.classList.remove('light', 'dark', 'midnight', 'dim', 'forest', 'sunset', 'ammu');
     root.classList.add(theme);
     localStorage.setItem('app-theme', theme);
   }, [theme]);
