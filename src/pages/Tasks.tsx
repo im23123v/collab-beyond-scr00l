@@ -18,12 +18,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-// User filter mapping (sindh removed)
 const USER_FILTERS = [
   { value: 'all', label: 'All' },
   { value: 'mine', label: 'Mine' },
   { value: '1a42f133-7129-41dc-ae20-f50bb4696923', label: 'Vishwa' },
-  { value: '08369e71-ad89-478e-85b5-86be96661f0d', label: 'Amru' },
+  { value: '08369e71-ad89-478e-85b5-86be96661f0d', label: 'Ammulu' },
 ];
 
 export default function Tasks() {

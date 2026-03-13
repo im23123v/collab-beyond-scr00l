@@ -22,7 +22,7 @@ export function DayScoring() {
   const [peerComment, setPeerComment] = useState('');
 
   // Determine who the peer is
-  const peerId = user?.id === VISHWA_ID ? AMRU_ID : VISHWA_ID;
+  const peerId = user?.id === VISHWA_ID ? AMMULU_ID : VISHWA_ID;
   const peerProfile = allProfiles.find(p => p.user_id === peerId);
   const myRatingForPeer = myRatingsForOthers.find(r => r.user_id === peerId);
   const peerRatingForMe = ratingsFromOthers.find(r => r.rated_by === peerId);

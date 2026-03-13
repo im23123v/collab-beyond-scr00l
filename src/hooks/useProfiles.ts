@@ -35,7 +35,7 @@ export function useProfiles() {
     : profiles.filter(p => p.user_id === user?.id || p.username === 'vishwa');
 
   // Get admin profile for chat
-  const adminProfile = profiles.find(p => p.username === 'vishwa');
+  const adminProfile = profiles.find(p => p.username === 'vishwa') || profiles.find(p => p.display_name?.toLowerCase() === 'vishwa');
 
   return {
     profiles: visibleProfiles,

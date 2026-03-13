@@ -14,8 +14,7 @@ export function ProfileSwitcher({ selectedProfile, onProfileChange }: ProfileSwi
     return null;
   }
 
-  // Filter to specific users: vishwa, amru, vinay (sindh removed)
-  const allowedUsernames = ['vishwa', 'amru', 'vinay'];
+  const allowedUsernames = ['vishwa', 'ammulu'];
   const filteredProfiles = allProfiles.filter(p => allowedUsernames.includes(p.username));
 
   return (
