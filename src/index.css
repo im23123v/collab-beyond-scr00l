@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Quicksand:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Quicksand:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -289,6 +289,63 @@
     --sidebar-border: 20 20% 15%;
     --sidebar-ring: 25 95% 55%;
   }
+
+  /* Ammu - Dreamy rose-pink & cream feminine aesthetic */
+  .ammu {
+    --background: 340 30% 97%;
+    --foreground: 340 25% 15%;
+
+    --card: 340 20% 99%;
+    --card-foreground: 340 25% 15%;
+
+    --popover: 340 20% 99%;
+    --popover-foreground: 340 25% 15%;
+
+    --primary: 330 65% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 340 30% 93%;
+    --secondary-foreground: 340 25% 20%;
+
+    --muted: 340 20% 94%;
+    --muted-foreground: 340 10% 45%;
+
+    --accent: 280 50% 62%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 160 50% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 80% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 340 25% 90%;
+    --input: 340 25% 90%;
+    --ring: 330 65% 55%;
+
+    --radius: 1.2rem;
+
+    --sidebar-background: 340 25% 98%;
+    --sidebar-foreground: 340 25% 15%;
+    --sidebar-primary: 330 65% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 340 30% 93%;
+    --sidebar-accent-foreground: 340 25% 15%;
+    --sidebar-border: 340 25% 92%;
+    --sidebar-ring: 330 65% 55%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(330 65% 55%) 0%, hsl(280 50% 62%) 50%, hsl(260 55% 60%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(160 50% 45%) 0%, hsl(180 55% 45%) 100%);
+    --gradient-warm: linear-gradient(135deg, hsl(350 70% 60%) 0%, hsl(20 80% 60%) 100%);
+    
+    --shadow-sm: 0 1px 3px 0 hsl(330 40% 50% / 0.06);
+    --shadow-md: 0 4px 14px -2px hsl(330 40% 50% / 0.1), 0 2px 4px -2px hsl(330 40% 50% / 0.06);
+    --shadow-lg: 0 12px 28px -4px hsl(330 40% 50% / 0.14), 0 4px 8px -4px hsl(330 40% 50% / 0.1);
+    --shadow-glow: 0 0 28px hsl(330 65% 55% / 0.3);
+  }
 }
 
 @layer base {
@@ -299,6 +356,10 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Quicksand', 'Inter', system-ui, sans-serif;
+  }
+
+  .ammu body, .ammu {
+    font-family: 'Nunito', 'Quicksand', system-ui, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -326,17 +387,30 @@
   .glass {
     @apply bg-card/80 backdrop-blur-xl border border-border/50;
   }
+
+  .glass-rose {
+    @apply bg-card/70 backdrop-blur-2xl border border-border/40;
+    box-shadow: 0 8px 32px hsl(330 60% 50% / 0.06), inset 0 1px 0 hsl(0 0% 100% / 0.4);
+  }
   
   .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
+    animation: fadeIn 0.4s ease-out;
   }
   
   .animate-slide-up {
-    animation: slideUp 0.4s ease-out;
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
   
   .animate-scale-in {
-    animation: scaleIn 0.3s ease-out;
+    animation: scaleIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2.5s ease-in-out infinite;
   }
   
   @keyframes fadeIn {
@@ -345,13 +419,33 @@
   }
   
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
   }
   
   @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
+    from { opacity: 0; transform: scale(0.92); }
     to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
   }
   
   .scrollbar-thin {
@@ -370,5 +464,20 @@
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background-color: hsl(var(--muted-foreground) / 0.3);
     border-radius: 3px;
+  }
+
+  /* Card hover effect */
+  .card-hover {
+    @apply transition-all duration-300;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Dot pattern background */
+  .dot-pattern {
+    background-image: radial-gradient(hsl(var(--primary) / 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 }

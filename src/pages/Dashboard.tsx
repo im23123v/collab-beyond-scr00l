@@ -58,28 +58,29 @@ export default function Dashboard() {
     <AppLayout>
       <div className="space-y-6 animate-fade-in">
         {/* Beautiful Hero Header */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/15 via-accent/10 to-primary/5 p-6 md:p-8 border border-primary/10">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/15 via-accent/8 to-primary/5 p-6 md:p-8 border border-primary/10 dot-pattern">
+          <div className="absolute top-0 right-0 w-72 h-72 bg-primary/8 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 animate-float" />
+          <div className="absolute bottom-0 left-0 w-56 h-56 bg-accent/6 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+          <div className="absolute top-1/2 left-1/2 w-32 h-32 bg-primary/4 rounded-full blur-2xl animate-shimmer" />
           
           <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium text-primary">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="h-5 w-5 text-primary animate-pulse-soft" />
+                <span className="text-sm font-semibold text-primary tracking-wide uppercase">
                   {format(new Date(), 'EEEE, MMMM d')}
                 </span>
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+              <h1 className="text-2xl md:text-4xl font-extrabold text-foreground tracking-tight">
                 {selectedProfile === 'mine' 
                   ? `${greeting()}, ${profile?.display_name || 'there'}` 
                   : `${getProfileName()}'s Dashboard`
-                } ✨
+                } 💫
               </h1>
-              <p className="text-muted-foreground mt-1 text-sm">
+              <p className="text-muted-foreground mt-2 text-sm md:text-base">
                 {todayTasks.length > 0 
                   ? `You have ${todayTasks.length} tasks today — ${todayCompleted} done!`
-                  : "No tasks scheduled today. Enjoy your day!"
+                  : "No tasks scheduled today. Enjoy your day! ☀️"
                 }
               </p>
             </div>
