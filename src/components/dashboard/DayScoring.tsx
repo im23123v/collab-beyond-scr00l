@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Star, Send, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
 
-const AMRU_ID = '08369e71-ad89-478e-85b5-86be96661f0d';
+const AMMULU_ID = '08369e71-ad89-478e-85b5-86be96661f0d';
 const VISHWA_ID = '1a42f133-7129-41dc-ae20-f50bb4696923';
 
 export function DayScoring() {
