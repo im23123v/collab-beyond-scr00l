@@ -108,7 +108,7 @@ export function PomodoroTimer({ className }: PomodoroTimerProps) {
   }, [mode, completedPomodoros, handleModeChange]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
 
     if (isRunning && timeLeft > 0) {
       interval = setInterval(() => {
