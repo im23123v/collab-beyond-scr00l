@@ -29,10 +29,12 @@ export function useProfiles() {
     enabled: !!user,
   });
 
-  // For non-admin users, filter to only show themselves and admin (vishwa)
+  // Filter out deactivated users (sindh, vinay) - only vishwa and ammulu are active
+  const activeProfiles = profiles.filter(p => ['vishwa', 'ammulu'].includes(p.username));
+
   const visibleProfiles = isAdmin 
-    ? profiles 
-    : profiles.filter(p => p.user_id === user?.id || p.username === 'vishwa');
+    ? activeProfiles 
+    : activeProfiles.filter(p => p.user_id === user?.id || p.username === 'vishwa');
 
   // Get admin profile for chat
   const adminProfile = profiles.find(p => p.username === 'vishwa') || profiles.find(p => p.display_name?.toLowerCase() === 'vishwa');
