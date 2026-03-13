@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Star, Send, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
 
-const AMRU_ID = '08369e71-ad89-478e-85b5-86be96661f0d';
+const AMMULU_ID = '08369e71-ad89-478e-85b5-86be96661f0d';
 const VISHWA_ID = '1a42f133-7129-41dc-ae20-f50bb4696923';
 
 export function DayScoring() {
@@ -22,7 +22,7 @@ export function DayScoring() {
   const [peerComment, setPeerComment] = useState('');
 
   // Determine who the peer is
-  const peerId = user?.id === VISHWA_ID ? AMRU_ID : VISHWA_ID;
+  const peerId = user?.id === VISHWA_ID ? AMMULU_ID : VISHWA_ID;
   const peerProfile = allProfiles.find(p => p.user_id === peerId);
   const myRatingForPeer = myRatingsForOthers.find(r => r.user_id === peerId);
   const peerRatingForMe = ratingsFromOthers.find(r => r.rated_by === peerId);
